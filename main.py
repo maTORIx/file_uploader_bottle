@@ -24,7 +24,7 @@ def main():
     parser.add_argument('--port', type=int, default=8000)
     
     args = parser.parse_args()
-    run(app=app, host=args.host, port=args.port, reloader=True)
+    run(app=app, host=args.host, port=args.port, debug=True ,reloader=True)
 
 if __name__ == '__main__':
     main()

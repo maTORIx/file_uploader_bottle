@@ -10,8 +10,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <!-- material icons -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src='./static_files/js/index.js'></script>
 
 </head>
@@ -24,24 +23,42 @@
                     <h1>File Uploader</h1>
                     <div class="card">
                         <div class="card-body">
-                            <form action="/api/files" method='POST' enctype="multipart/form-data">
-                                <input type="file" name='data'/>
-                                <button class="btn btn-block btn-secondary btn-sm">
-                                    <i class="material-icons">send</i>
+                            <form action="/api/files" method='POST' enctype="multipart/form-data"
+                                v-on:submit='uploadFile'>
+                                <div class="input-group">
+                                    <label class="input-group-btn">
+                                        <span class="btn btn-secondary">
+                                            ファイルを選択
+                                            <input type='file' style='display: none' name='data'
+                                                v-on:change='onUploadFileChange' />
+                                        </span>
+                                    </label>
+                                    <input type="text" class='form-control' v-bind:value='selected_filename' readonly />
+                                </div>
+                                <button class="btn btn-primary align-items-center " type="submit">
+                                    <i class="material-icons" style="font-size: 1rem;">cloud_upload</i>
                                 </button>
                             </form>
                         </div>
                     </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <div v-if='files == null' class="justify-content-center">
-                                <img src="./static_files/image/loading_good.gif" alt="loading" width='100%'>
-                            </div>
-                            <div v-if='files != null && files.length < 1' v-else>
-                                <p>File not found.</p>
-                            </div>
-                            <div class="card" v-for='file in files' v-else>
-                                <p>[[file.display_name]]</p>
+                    <div>
+                        <div v-if='files == null' class="justify-content-center">
+                            <img src="./static_files/image/loading_good.gif" alt="loading" width='100%' />
+                        </div>
+                        <div v-if='files != null && files.length < 1'>
+                            <p>File not found.</p>
+                        </div>
+                        <div class='list-group' v-else>
+                            <div class="list-group-item d-flex justify-content-between align-items-center"
+                                v-for='file in files'>
+                                [[file.display_name]]
+                                <span>
+                                    <a v-bind:href="file.download_url">
+                                        <button class="btn btn-large">
+                                            <i class="material-icons">save_alt</i>
+                                        </button>
+                                    </a>
+                                </span>
                             </div>
                         </div>
                     </div>

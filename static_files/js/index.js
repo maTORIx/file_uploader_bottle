@@ -1,14 +1,10 @@
 const api_path = '/api'
 
-function parse_filenames(filenames) {
-    files = []
-    for (filename of filenames) {
-        files.push({
-            download_url: api_path + '/files/' + filename,
-            display_name: filename.split('_').slice(1).join('_')
-        })
+function parse_filename(filename) {
+    return {
+        download_url: api_path + '/files/' + filename,
+        display_name: filename.split('_').slice(1).join('_')
     }
-    return files
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -17,28 +13,46 @@ document.addEventListener('DOMContentLoaded', function() {
         delimiters: ["[[", "]]"],
         data: () => {
             return {
-                files: null
+                files: null,
+                selected_filename: '',
+                uploading: false,
             }
         },
         methods: {
             loadFiles: function(start=0, size=10){
                 self = this
-                return fetch(api_path + '/files').then((resp) => {
+                endpoint = api_path + `/files?start=${start}&size=${size}`
+
+                return fetch(endpoint).then((resp) => {
                     return resp.text()
                 }).then((text) => {
                     filenames = JSON.parse(text)['files']
-                    files = parse_filenames(filenames)
-                    console.log(files)
+                    files = filenames.map(parse_filename)
                     self.files = files
                 })
             },
-            uploadFiles: function(e) {
+            uploadFile: async function(e) {
                 e.preventDefault()
-                print(e)
+                formdata = new FormData(e.target)
+                resp = await fetch(api_path + '/files', {
+                    'method': 'POST',
+                    'body': formdata
+                })
+
+                if (!resp.ok) {
+                    error_text = await resp.text()
+                    throw Error(`Upload Failed. error: ${text}`)
+                } else {
+                    json = await resp.json()
+                    self.files.unshift(parse_filename(json['uploaded_file']))
+                }
+            },
+            onUploadFileChange: function(e) {
+                this.selected_filename = e.target.files[0].name
             }
         },
     })
 
-    setTimeout(app.loadFiles, 2000)
+    setTimeout(app.loadFiles, 1000)
     
 })

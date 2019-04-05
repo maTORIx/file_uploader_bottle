@@ -10,6 +10,8 @@ api = Bottle()
 UPLOADED_FILES_PATH = './uploaded_files'
 MAX_FILESIZE = 1024 * 1024 * 5 # 5MB
 
+os.makedirs(UPLOADED_FILES_PATH, exist_ok=True)
+
 def save_file(data):
     uid = uuid.uuid4()
     filename = '{}_{}'.format(uid, data.filename)
@@ -21,8 +23,10 @@ def save_file(data):
 @api.route('/files')
 def api_files():
     files = os.listdir(UPLOADED_FILES_PATH)
+    start = int(request.query.get('start', '0'))
+    size = int(request.query.get('size', '5'))
     result = {
-        'files': files
+        'files': files[start:start + size]
     }
     return json.dumps(result)
 
